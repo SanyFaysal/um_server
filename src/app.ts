@@ -1,7 +1,7 @@
 import cors from 'cors';
 import express, { Application, Request, Response } from 'express';
 import globalErrorHandler from './errors/globalErrorHandler';
-import notFound from './errors/NotFound';
+import notFound from './errors/notFound';
 
 
 const app: Application = express();
