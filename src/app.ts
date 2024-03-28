@@ -2,7 +2,7 @@ import cors from 'cors';
 import express, { Application, Request, Response } from 'express';
 import globalErrorHandler from './errors/globalErrorHandler';
 import notFound from './errors/notFound';
-
+import routes from './app/routes'
 
 const app: Application = express();
 
@@ -17,6 +17,7 @@ app.get('/', (req: Request, res: Response) => {
     })
 })
 
+app.use('/api/v1', routes)
 
 //global error handler
 app.use(globalErrorHandler);
