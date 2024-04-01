@@ -69,10 +69,19 @@ const getBestCourse = async () => {
 };
 
 
-const updateSingleCourse = async (courseId: string, payload: Partial<ICourse>) => {
-    const updatedPayloadKeys: any = Object.keys(payload);
+const updateSingleCourse = async (courseId: string, payload: any) => {
+
+    const { details, tags, ...data }: any = payload;
 
 
+    if (details) {
+        for (const item in details)
+            data[`details.${item}`] = details[item]
+    }
+
+
+    const result: any = Course.updateOne({ _id: courseId }, { $set: data }, { upsert: true })
+    return result
 };
 
 export const CourseService = {
