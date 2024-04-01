@@ -1,7 +1,7 @@
 
 import { ICourse, ICourseReviewResult } from "./course.interface";
 import { Course } from "./course.model";
-import { courseWeekDiffDuration } from "../../../utils/courseWeekDiffduration";
+import { courseWeekDiffDuration } from "../../../helpers/courseWeekDiffduration";
 import { Review } from "../review/review.model";
 import { IReview } from "../review/review.interface";
 
@@ -26,6 +26,49 @@ const getSingleCourseReview = async (courseId: string): Promise<ICourseReviewRes
 
     return { course: courseResult, reviews: reviewsResult };
 };
+
+const getBestCourse = async () => {
+    const [{ averageRating, reviewCount, ...data }] = await Course.aggregate([
+        {
+            $lookup: {
+                from: 'reviews',
+                localField: '_id',
+                foreignField: 'courseId',
+                as: 'reviews'
+            }
+        },
+        {
+            $addFields: {
+                averageRating: { $avg: '$reviews.rating' }
+            }
+        },
+        {
+            $addFields: {
+                reviewCount: { $size: '$reviews' }
+            }
+        },
+        {
+            $sort: { averageRating: -1 }
+        },
+        {
+            $project: {
+                reviews: 0
+            }
+        },
+        {
+            $limit: 1
+        }
+    ]);
+
+
+    return {
+        course: data,
+        averageRatings: Number(averageRating.toFixed(2)),
+        reviewCount: reviewCount,
+    };
+};
+
+
 const updateSingleCourse = async (courseId: string, payload: Partial<ICourse>): Promise<ICourse | null> => {
     const result = await Course.findOneAndUpdate({ _id: courseId }, { new: true });
     return result;
@@ -35,6 +78,7 @@ export const CourseService = {
     createCourse,
     getAllCourses,
     getSingleCourse,
+    getBestCourse,
     updateSingleCourse,
     getSingleCourseReview,
 }

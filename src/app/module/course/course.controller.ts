@@ -46,7 +46,18 @@ const getSingleCourseReviews = catchAsync(async (req: Request, res: Response) =>
     return sendResponse<ICourseReviewResult>(res, {
         statusCode: httpStatus.OK,
         success: true,
-        message: 'Course retrieve successful',
+        message: 'Course with reviews retrieve successful',
+        data: result
+    })
+});
+
+const getBestCourse = catchAsync(async (req: Request, res: Response) => {
+    const result = await CourseService.getBestCourse();
+
+    return sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Course with reviews retrieve successful',
         data: result
     })
 });
@@ -69,6 +80,7 @@ export const CourseController = {
     createCourse,
     getAllCourses,
     getSingleCourse,
+    getBestCourse,
     getSingleCourseReviews,
     updateSingleCourse,
 }

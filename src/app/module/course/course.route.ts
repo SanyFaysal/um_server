@@ -7,6 +7,11 @@ router.route('/')
     .post(CourseController.createCourse)
     .get(CourseController.getAllCourses)
 
+router.route('/best')
+    .get(CourseController.getBestCourse)
+
+
+
 router.route('/:courseId/reviews')
     .get(CourseController.getSingleCourseReviews)
 
