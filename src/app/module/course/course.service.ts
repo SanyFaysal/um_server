@@ -69,9 +69,10 @@ const getBestCourse = async () => {
 };
 
 
-const updateSingleCourse = async (courseId: string, payload: Partial<ICourse>): Promise<ICourse | null> => {
-    const result = await Course.findOneAndUpdate({ _id: courseId }, { new: true });
-    return result;
+const updateSingleCourse = async (courseId: string, payload: Partial<ICourse>) => {
+    const updatedPayloadKeys: any = Object.keys(payload);
+
+
 };
 
 export const CourseService = {

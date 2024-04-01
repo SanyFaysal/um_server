@@ -67,7 +67,7 @@ const updateSingleCourse = catchAsync(async (req: Request, res: Response) => {
     const payload = req.body;
 
     const result = await CourseService.updateSingleCourse(courseId, payload);
-    return sendResponse<ICourse>(res, {
+    return sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
         message: 'Course retrieve successful',
