@@ -78,6 +78,17 @@ const updateSingleCourse = async (courseId: string, payload: any) => {
         for (const item in details)
             data[`details.${item}`] = details[item]
     }
+    if (tags && tags.length) {
+        for (let index = 0; index < tags.length; index++) {
+            const updateObject: any = {};
+            if (tags[index]?.isDeleted) {
+                updateObject['$pull'] = { tags: { name: tags[index].name } };
+            } else {
+                updateObject['$set'] = { [`tags.${index}`]: tags[index] };
+            }
+            await Course.findByIdAndUpdate({ _id: courseId, 'tags.name': tags[index].name }, updateObject);
+        }
+    }
 
 
     const result: any = Course.updateOne({ _id: courseId }, { $set: data }, { upsert: true })
