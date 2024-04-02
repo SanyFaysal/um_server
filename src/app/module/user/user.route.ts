@@ -1,27 +1,27 @@
-import express from 'express';
-import { UserControllers } from './user.controller';
-import { authChecker } from '../../middlewares/authChecker';
-import { USER_ROLE } from './user.constants';
-import { validateRequest } from '../../middlewares/validateRequest';
-import { userValidations } from './user.validation';
+import express from "express";
+import { UserControllers } from "./user.controller";
+import { USER_ROLE } from "./user.constants";
+import { userValidations } from "./user.validation";
+import { validateRequest } from "../../../middlewares/validateRequest";
+import { authChecker } from "../../../middlewares/authChecker";
 
 const router = express.Router();
 
 router.post(
-  '/register',
+  "/register",
   validateRequest(userValidations.userValidationSchema),
-  UserControllers.createUser,
+  UserControllers.createUser
 );
 router.post(
-  '/login',
+  "/login",
   validateRequest(userValidations.userLoginValidationSchema),
-  UserControllers.userLogin,
+  UserControllers.userLogin
 );
 router.post(
-  '/change-password',
+  "/change-password",
   authChecker(USER_ROLE.admin, USER_ROLE.user),
   validateRequest(userValidations.passwordChangeValidationSchema),
-  UserControllers.userPasswordChange,
+  UserControllers.userPasswordChange
 );
 
 export const UserRoutes = router;

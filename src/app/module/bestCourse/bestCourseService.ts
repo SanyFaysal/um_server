@@ -1,8 +1,10 @@
-import { CourseModel } from '../course/course.model';
-import { ReviewModel } from '../review/review.model';
+import { Course } from "../course/course.model";
+import { Review } from "../review/review.model";
+
+
 
 const getBestCourseFromDB = async () => {
-  const pipeline = await ReviewModel.aggregate([
+  const pipeline = await Review.aggregate([
     {
       $group: {
         _id: '$courseId',
@@ -35,7 +37,7 @@ const getBestCourseFromDB = async () => {
     },
   ]);
   const bestCourseId = pipeline[0].course._id;
-  const bestCourse = await CourseModel.findById(bestCourseId).populate({
+  const bestCourse = await Course.findById(bestCourseId).populate({
     path: 'createdBy',
     select: '-createdAt -updatedAt',
   });

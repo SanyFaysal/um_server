@@ -1,7 +1,8 @@
 import httpStatus from 'http-status';
-import { catchAsync } from '../../utils/catchAsync';
-import sendResponse from '../../utils/sendResponse';
+
 import { BestCourseServices } from './bestCourseService';
+import catchAsync from '../../../utils/catchAsync';
+import sendResponse from '../../../utils/sendResponse';
 
 const getBestCourse = catchAsync(async (req, res) => {
   const result = await BestCourseServices.getBestCourseFromDB();

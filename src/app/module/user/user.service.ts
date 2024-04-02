@@ -1,16 +1,16 @@
-import httpStatus from 'http-status';
-import AppError from '../../errors/AppError';
+import httpStatus from "http-status";
 import {
   TPasswordChangePayload,
   TUser,
   TUserLoginCredentials,
-} from './user.interface';
-import { UserModel } from './user.model';
-import { createToken } from './user.utils';
-import config from '../../config';
-import { JwtPayload } from 'jsonwebtoken';
-import bcrypt from 'bcrypt';
-import { Response } from 'express';
+} from "./user.interface";
+import { UserModel } from "./user.model";
+import { createToken } from "./user.utils";
+import bcrypt from "bcrypt";
+import { Response } from "express";
+import ApiError from "../../../errors/ApiError";
+import config from "../../../config";
+import { JwtPayload } from "jsonwebtoken";
 
 const createUserIntoDB = async (payload: TUser) => {
   const result = await UserModel.create(payload);
@@ -22,18 +22,18 @@ const userLoginService = async (payload: TUserLoginCredentials) => {
   const existingUser = await UserModel.existingUser(username);
 
   if (!existingUser) {
-    throw new AppError(
+    throw new ApiError(
       httpStatus.NOT_FOUND,
-      'User not found',
-      'There is no user with this username',
+      "User not found",
+      "There is no user with this username"
     );
   }
 
   if (!(await UserModel.doesPasswordMatch(password, existingUser.password))) {
-    throw new AppError(
+    throw new ApiError(
       httpStatus.FORBIDDEN,
-      'Incorrect password',
-      "Password doesn't match!",
+      "Incorrect password",
+      "Password doesn't match!"
     );
   }
 
@@ -46,7 +46,7 @@ const userLoginService = async (payload: TUserLoginCredentials) => {
   const accessToken = createToken(
     jwtPayload,
     config.jwt_access_token as string,
-    config.access_token_expiration as string,
+    config.access_token_expiration as string
   );
 
   return { user: existingUser, token: accessToken };
@@ -55,34 +55,34 @@ const userLoginService = async (payload: TUserLoginCredentials) => {
 const changePassword = async (
   payload: TPasswordChangePayload,
   user: JwtPayload,
-  res: Response,
+  res: Response
 ) => {
   const { currentPassword, newPassword } = payload;
 
   const { _id } = user;
 
   const existingUser = await UserModel.findById(_id).select(
-    '+password +passwordHistory -createdAt -updatedAt',
+    "+password +passwordHistory -createdAt -updatedAt"
   );
 
   if (!existingUser) {
-    throw new AppError(
+    throw new ApiError(
       httpStatus.NOT_FOUND,
-      'User not found',
-      'User not found!',
+      "User not found",
+      "User not found!"
     );
   }
 
   const doesPasswordMatch = await UserModel.doesPasswordMatch(
     currentPassword,
-    existingUser.password,
+    existingUser.password
   );
 
   if (!doesPasswordMatch) {
-    throw new AppError(
+    throw new ApiError(
       httpStatus.FORBIDDEN,
-      'Incorrect Password!',
-      'Current password do not match!',
+      "Incorrect Password!",
+      "Current password do not match!"
     );
   }
 
@@ -95,7 +95,7 @@ const changePassword = async (
   if (isPasswordInHistory) {
     const formattedTime = isPasswordInHistory.timestamp
       .toLocaleString()
-      .replace(',', ' at');
+      .replace(",", " at");
 
     res.status(400).json({
       success: false,
@@ -108,7 +108,7 @@ const changePassword = async (
 
   const newHashedPassword = bcrypt.hashSync(
     newPassword,
-    Number(config.bcrypt_salt_rounds),
+    Number(config.bcrypt_salt_rounds)
   );
 
   const result = await UserModel.updatePassword(_id, newHashedPassword);

@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Schema, Types, model } from 'mongoose';
-import { TPasswordChange, TUser, UserMethod } from './user.interface';
-import { userRole } from './user.constants';
-import bcrypt from 'bcrypt';
-import config from '../../config';
+import { Schema, Types, model } from "mongoose";
+import { TPasswordChange, TUser, UserMethod } from "./user.interface";
+import { userRole } from "./user.constants";
+import config from "../../../config";
+import bcrypt from "bcrypt";
 
 const passwordValidator = (password: string): boolean => {
   const passwordRegex =
@@ -27,7 +27,7 @@ const userSchema = new Schema<TUser, UserMethod>(
       validate: {
         validator: passwordValidator,
         message:
-          'Password must have one lowercase letter, one uppercase letter, one special character, one number and be at least 8 characters in length',
+          "Password must have one lowercase letter, one uppercase letter, one special character, one number and be at least 8 characters in length",
       },
     },
     passwordHistory: {
@@ -35,7 +35,7 @@ const userSchema = new Schema<TUser, UserMethod>(
       default: [],
       select: 0,
     },
-    role: { type: String, enum: userRole, default: 'user' },
+    role: { type: String, enum: userRole, default: "user" },
   },
   {
     timestamps: true,
@@ -46,17 +46,17 @@ const userSchema = new Schema<TUser, UserMethod>(
         delete modified.passwordHistory;
       },
     },
-  },
+  }
 );
 
 /*_______________________middlewares___________________________*/
 
-userSchema.pre('save', async function (next) {
+userSchema.pre("save", async function (next) {
   // eslint-disable-next-line @typescript-eslint/no-this-alias
   const user = this;
   const hashedPassword = await bcrypt.hash(
     user.password,
-    Number(config.bcrypt_salt_rounds),
+    Number(config.bcrypt_salt_rounds)
   );
 
   // hashing password and save into DB
@@ -78,20 +78,20 @@ userSchema.pre('save', async function (next) {
 
 userSchema.statics.existingUser = async function (username: string) {
   return await UserModel.findOne({ username }).select(
-    '+password -createdAt -updatedAt',
+    "+password -createdAt -updatedAt"
   );
 };
 
 userSchema.statics.doesPasswordMatch = async function (
   plainTextPassword: string,
-  hashedPassword: string,
+  hashedPassword: string
 ) {
   return await bcrypt.compare(plainTextPassword, hashedPassword);
 };
 
 userSchema.statics.updatePassword = async function (
   id: Types.ObjectId,
-  newPassword: string,
+  newPassword: string
 ) {
   const updatedUser = await this.findByIdAndUpdate(
     id,
@@ -112,9 +112,9 @@ userSchema.statics.updatePassword = async function (
         },
       },
     },
-    { new: true },
+    { new: true }
   );
   return updatedUser;
 };
 
-export const UserModel = model<TUser, UserMethod>('User', userSchema);
+export const UserModel = model<TUser, UserMethod>("User", userSchema);
